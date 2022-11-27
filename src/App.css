@@ -1,4 +1,5 @@
 .App {
+  font-size: 15px;
   text-align: center;
 }
 
@@ -14,14 +15,14 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #000000;
 }
 
 .App-link {
@@ -46,4 +47,54 @@
 .form-column {
   margin: 10px;
   width: 45%;
+  border: solid 1px #c7c7c7;
+  padding: 20px 60px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 16, 0.16);
+  border-radius: 10px;
+}
+
+.content-form {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-left {
+  width: 30%;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.content-right {
+  width: 70%;
+  margin: auto;
+
+}
+
+.rule {
+  background-color:#99FFFF;
+  height: 30px;
+  margin: auto;
+}
+
+.rule2 {
+  background-color:#FF6666;
+  height: 30px;
+  margin: auto;
+}
+
+.content-title {
+  margin: 40px 0px;
+}
+
+.footer {
+  font-size: 20px;
+  display: flex;
+  width: 100%;
+}
+
+.footer-child {
+  width: 24%;
+  padding: 20px 60px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 16, 0.16);
+  border-radius: 10px;
 }
