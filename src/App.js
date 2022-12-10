@@ -51,7 +51,7 @@ function App() {
   const onChangePin1 = (e) => {
     console.log(e);
     if(e) setSrcPin1(PinOnIcon)
-    else setSrcPin1(PinOnIcon);
+    else setSrcPin1(PinOffIcon);
     
   };
 
