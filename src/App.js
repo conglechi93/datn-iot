@@ -5,74 +5,256 @@ import { Button, Input, Switch } from 'antd';
 // import { getFirestore, 
 //   ///collection, getDocs 
 // } from 'firebase/firestore/lite';
+import {ref, set, get, update, remove, child} from 'firebase/database'
 import { useEffect, useState } from "react";
-import db from './firebaseConfig.js'
 import FanOnIcon from './image/fan_on.png';
 import FanOffIcon from './image/fan_off.png';
 import MistOnIcon from './image/mist_on.png';
 import MistOffIcon from './image/mist_off.png';
 import PinOnIcon from './image/pin_on.png';
 import PinOffIcon from './image/pin_off.png';
+import { Crud } from './components/crud';
+import StartFirebase from './firebaseConfig';
+
 
 
 
 function App() {
-  // const firebaseConfig = {
-  //   apiKey: "AIzaSyBJAQ9KqYJQgqfWGMRAmXEdBFovGpbqGrg",
-  //   authDomain: "datn-pyrebase.firebaseapp.com",
-  //   projectId: "datn-pyrebase",
-  //   storageBucket: "datn-pyrebase.appspot.com",
-  //   messagingSenderId: "258914601635",
-  //   appId: "1:258914601635:web:5cb1b3da7718815c408d16",
-  //   measurementId: "G-4GC4RKJL6T"
-  // };
+  const db = StartFirebase();
   const [srcFan, setSrcFan] = useState();
+  const [checkFan, setCheckFan] = useState(true);
+
   const [srcMist, setSrcMist] = useState();
+  const [checkMist, setCheckMist] = useState(true);
+  
   const [srcPin1, setSrcPin1] = useState();
+  const [checkPin1, setCheckPin1] = useState(true);
+
   const [srcPin2, setSrcPin2] = useState();
-  // const [srcFan, setSrcFan] = useState();
-  // const [srcFan, setSrcFan] = useState()
+  const [checkPin2, setCheckPin2] = useState(true);
+
+  const [humidity, setHumidity] = useState(0);
+  const [temperature, setTemperature] = useState(0);
+  const [pause, setPause] = useState(0);
+
+  const [inputValue, setInputValue] = useState(() => {
+    const dbRef = ref(db);
+    get(child(dbRef,'threshold/value')).then((snapshot) => {
+      if(snapshot.exists()) {
+        return snapshot.val().toString();
+      }
+    })
+  }
+    
+  );
+
+
+  const getData = () => {
+    const dbRef = ref(db);
+    get(child(dbRef,'humidity')).then((snapshot) => {
+      if(snapshot.exists()) {
+        setHumidity(snapshot.val());
+      }
+    })
+
+    get(child(dbRef,'temperature')).then((snapshot) => {
+      if(snapshot.exists()) {
+        setTemperature(snapshot.val());
+      }
+    })
+    get(child(dbRef,'mode/fan/mode')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() != checkFan.toString()) {
+          if(snapshot.val() == 'true') {
+            setSrcFan(FanOnIcon)
+            setCheckFan(true);
+          }
+          else {
+            setCheckFan(false);
+            setSrcFan(FanOffIcon)
+          }
+        }  
+      }
+    })
+
+    get(child(dbRef,'mode/pin1/mode')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() != checkPin1.toString()) {
+          if(snapshot.val() == 'true') {
+            setSrcPin1(PinOnIcon)
+            setCheckPin1(true);
+          }
+          else {
+            setSrcPin1(PinOffIcon)
+            setCheckPin1(false);
+          }
+        }  
+      }
+    })
+
+    get(child(dbRef,'mode/pin2/mode')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() != checkPin2.toString()) {
+          if(snapshot.val() == 'true') {
+            setSrcPin2(PinOnIcon)
+            setCheckPin2(true);
+          }
+          else {
+            setSrcPin2(PinOffIcon)
+            setCheckPin2(false);
+          }
+        }  
+      }
+    })
+
+    get(child(dbRef,'mode/mist/mode')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() != checkMist.toString()) {
+          if(snapshot.val() == 'true') {
+            setSrcMist(MistOnIcon)
+            setCheckMist(true);
+          }
+          else {
+            setSrcMist(MistOffIcon)
+            setCheckMist(false);
+          }
+        }  
+      }
+    })
+
+  }
+
+  useEffect(() => {
+    setInterval(() => {
+      getData();
+    }
+    , 300);
+  })
+
+  
+
+  const updateData = ({device, mode}) => {
+    set(ref(db,'mode/' + device),
+    {
+      mode: mode
+    }).then(
+        () => {
+            console.log('Update data success');
+        } 
+    )
+    .catch((error) => alert("Err: " + error));
+}
 
   const onChangeFan = (e) => {
     console.log(e)
-    if(e) setSrcFan(FanOnIcon)
-    else setSrcFan(FanOffIcon)
+    const device = 'fan';
+    let mode;
+    if(e) {
+      mode = 'true';
+      updateData({device, mode})
+      setSrcFan(FanOnIcon)
+      setCheckFan(true)
+    }
+    else {
+      mode = 'false';
+      updateData({device, mode})
+      setSrcFan(FanOffIcon)
+      setCheckFan(false)
+    }
   }
 
   const onChangeMist = (e) => {
     console.log(e)
-    if(e) setSrcMist(MistOnIcon)
-    else setSrcMist(MistOffIcon);
+    const device = 'mist';
+    let mode;
+    if(e) {
+      mode = 'true';
+      updateData({device, mode})
+      setSrcMist(MistOnIcon)
+      setCheckMist(true)
+    }
+    else {
+      mode = 'false';
+      updateData({device, mode})
+      setSrcMist(MistOffIcon);
+      setCheckMist(false)
+    }
   }
-
 
   
   // Initialize Firebase
   const onChangePin1 = (e) => {
     console.log(e);
-    if(e) setSrcPin1(PinOnIcon)
-    else setSrcPin1(PinOffIcon);
-    
+    const device = 'pin1';
+    let mode;
+    if(e) {
+      mode = 'true';
+      updateData({device, mode})
+      setSrcPin1(PinOnIcon);
+      setCheckPin1(true);
+    }
+    else {
+      mode = 'false';
+      updateData({device, mode})
+      setSrcPin1(PinOffIcon);
+      setCheckPin1(false);
+    }    
   };
 
   const onChangePin2 = (e) => {
-    if(e) setSrcPin2(PinOnIcon)
-    else setSrcPin2(PinOffIcon);
+    const device = 'pin2';
+    let mode;
+    if(e) {
+      mode = 'true';
+      updateData({device, mode})
+      setSrcPin2(PinOnIcon)
+      setCheckPin2(true);
+    }
+    else {
+      mode = 'false';
+      updateData({device, mode})
+      setSrcPin2(PinOffIcon);
+      setCheckPin2(false);
+    }    
     
   };
 
-  const [blogs,setBlogs]=useState([])
-  const fetchBlogs=async()=>{
-    const response= db.collection('blog');
-    const data=await response.get();
-    data.docs.forEach(item=>{
-     setBlogs([...blogs,item.data()])
-    })
-  }
   useEffect(() => {
-    fetchBlogs();
-    setSrcFan(FanOnIcon)
+    setSrcFan(FanOnIcon);
+    setSrcPin1(PinOnIcon);
+    setSrcPin2(PinOnIcon);
+    setSrcMist(MistOnIcon);
   }, [])
+
+  const [autoCheck, setAutoCheck] = useState(true);
+
+  const handleAutocheck = () => {
+    setAutoCheck(!autoCheck);
+    console.log(autoCheck)
+    set(ref(db,'auto/'),
+    {
+      mode: autoCheck
+    }).then(
+      () => {
+          console.log('Update data success');
+      } 
+    )
+    .catch((error) => alert("Err: " + error));
+  }
+
+  const ChangeInputVale = () => {
+    console.log("inputValue",inputValue)
+    set(ref(db,'threshold/'),
+    {
+      value: inputValue
+    }).then(
+      () => {
+          console.log('Update data success');
+      } 
+    )
+    .catch((error) => alert("Err: " + error));
+  }
+
 
   return (
     <div className="App">
@@ -87,19 +269,19 @@ function App() {
             <div>Chọn chế độ</div>
             <div style={{display:"flex", justifyContent:"space-between", margin:'auto', textAlign:"center"}}>
               <p>AUTO</p>
-              <Switch defaultChecked style={{margin:"auto"}}/>
+              <Switch defaultChecked style={{margin:"auto"}} checked={autoCheck} onClick={handleAutocheck}/>
             </div>
             <div style={{marginBottom:"20px"}}>Chọn giá trị</div>
             <div style={{display:"flex", justifyContent:"space-between",textAlign:"center"}}>
-              <Input className='input-type'/>
-              <Button className='button-type'>Thiết lập</Button>
+              <Input className='input-type' value={inputValue} onChange={e => setInputValue(e.target.value)}/>
+              <Button className='button-type' onClick={ChangeInputVale}>Thiết lập</Button>
             </div>   
           </div>
           <div className='column-2'>
             <div className='footer'>
               <div className='footer-child'>
                 <p>ĐÈN 1-2</p>
-                <Switch defaultChecked onChange={onChangePin1} />
+                <Switch defaultChecked onChange={onChangePin1} checked={checkPin1}/>
                 <div className='form-img'>
                   <img className='img-ico' src={srcPin1}></img>
                 </div>
@@ -107,34 +289,24 @@ function App() {
               </div>
               <div className='footer-child'>
                 <p>ĐÈN 3-4</p>
-                <Switch defaultChecked onChange={onChangePin2} />
+                <Switch defaultChecked onChange={onChangePin2} checked={checkPin2}/>
                 <div className='form-img'>
                   <img className='img-ico' src={srcPin2}></img>
                 </div>
               </div>
               <div className='footer-child'>
                 <p>QUẠT</p>
-                <Switch defaultChecked onChange={onChangeFan} />
+                <Switch defaultChecked onChange={onChangeFan} checked={checkFan}/>
                 <div className='form-img'>
                   <img className='img-ico' src={srcFan}></img>
                 </div>
               </div>
               <div className='footer-child'>
                 <p>PHUN SƯƠNG</p>
-                <Switch defaultChecked onChange={onChangeMist} />
+                <Switch defaultChecked onChange={onChangeMist} checked={checkMist}/>
                 <div className='form-img'>
                   <img className='img-ico' src={srcMist}></img>
                 </div>
-                {
-                  blogs && blogs.map(blog=>{
-                    return(
-                      <div className="blog-container">
-                        <h4>{blog.title}</h4>
-                        <p>{blog.body}</p>
-                      </div>
-                    )
-                  })
-                }
               </div>
             </div>
           </div>
@@ -154,7 +326,7 @@ function App() {
             <div className='content-form'>
               <div className='content-left'>
                 <p>Humidity</p>
-                <p>66.2 %</p>
+                <p>{humidity.toFixed(1)} %</p>
               </div>
               <div className='content-right'>
                 <div className='rule'></div>
@@ -163,7 +335,7 @@ function App() {
             <div className='content-form'>
               <div className='content-left'>
                 <p>Temperature</p>
-                <p>66.2 C</p>
+                <p>{temperature.toFixed(1)} C</p>
               </div>
               <div className='content-right'>
                 <div className='rule2'></div>
