@@ -1,0 +1,37 @@
+import { useState, useEffect } from "react";
+import {
+  ref,
+  getDownloadURL,
+  listAll,
+} from "firebase/storage";
+import StartStore from "../../fireStoreConfig";
+
+const GetImageA = () => {
+  const [imageUrls, setImageUrls] = useState();
+  const storage = StartStore();
+
+  const imagesListRef = ref(storage, "");
+
+  useEffect(() => {
+    setInterval(() => {
+        console.log("abc")
+        listAll(imagesListRef).then((response) => {
+            response.items.forEach((item) => {
+              getDownloadURL(item).then((url) => {
+                  console.log('url', url)
+                setImageUrls(url);
+              });
+            });
+          });
+    }
+    , 300);
+  })
+
+  return (
+    <>
+        <img style={{width:"300px", height:"300px"}} src={imageUrls} />
+    </>
+  );
+}
+
+export default GetImageA;

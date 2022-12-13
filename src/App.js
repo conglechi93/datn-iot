@@ -5,6 +5,7 @@ import { Button, Input, Switch } from 'antd';
 // import { getFirestore, 
 //   ///collection, getDocs 
 // } from 'firebase/firestore/lite';
+import SoundWaveImg from './image/soundwave.webp'
 import {ref, set, get, update, remove, child} from 'firebase/database'
 import { useEffect, useState } from "react";
 import FanOnIcon from './image/fan_on.png';
@@ -15,6 +16,7 @@ import PinOnIcon from './image/pin_on.png';
 import PinOffIcon from './image/pin_off.png';
 import { Crud } from './components/crud';
 import StartFirebase from './firebaseConfig';
+import GetImageA from './components/getImage';
 
 
 
@@ -313,8 +315,13 @@ function App() {
         </div>
 
 
-        <div className='form-header'>
-          <div>SOUND WAVE</div>
+        <div style={{textAlign:"center"}}>
+          <div style={{textAlign:"center"}}>SOUND WAVE</div>
+          <img src={SoundWaveImg}></img>
+          <div>
+          <button>Chọn file</button>
+          </div>
+          
         </div>
 
 
@@ -342,7 +349,10 @@ function App() {
               </div>
             </div>
           </div>
-          <div className='form-column'>AV</div>
+          <div className='form-column camera-image'>
+            <div style={{margin:"10px 0"}}>Camera</div>
+            <GetImageA></GetImageA>
+          </div>
         </div>
 
       
