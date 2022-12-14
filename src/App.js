@@ -312,7 +312,7 @@ function App() {
   }
 
   const ChangeInputVale = () => {
-    set(ref(db,'DAIOT/'),
+    update(ref(db,'DAIOT/'),
     {
       threshold: inputValue
     }).then(
