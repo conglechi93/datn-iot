@@ -132,7 +132,7 @@ function App() {
     console.log(mode, inputValue)
     const value = inputValue ? inputValue : '25'
     if(device == 'modefan') {
-      set(ref(db,'DAIOT/'),
+      update(ref(db,'DAIOT/'),
       {
         modefan: mode,
         modemist: checkMist,
@@ -152,7 +152,7 @@ function App() {
     }
 
     if(device == 'modepin1') {
-      set(ref(db,'DAIOT/'),
+      update(ref(db,'DAIOT/'),
       {
         modefan: checkFan,
         modemist: checkMist,
@@ -171,7 +171,7 @@ function App() {
     }
 
     if(device == 'modepin2') {
-      set(ref(db,'DAIOT/'),
+      update(ref(db,'DAIOT/'),
       {
         modefan: checkFan,
         modemist: checkMist,
@@ -190,7 +190,7 @@ function App() {
     }
 
     if(device == 'modemist') {
-      set(ref(db,'DAIOT/'),
+      update(ref(db,'DAIOT/'),
       {
         modefan: checkFan,
         modemist: mode,
@@ -300,10 +300,9 @@ function App() {
 
   const handleAutocheck = () => {
     setAutoCheck(!autoCheck);
-    console.log(autoCheck)
-    set(ref(db,'DAIOT/'),
+    update(ref(db,'DAIOT/'),
     {
-      modeauto: autoCheck
+      modeauto: !autoCheck
     }).then(
       () => {
           console.log('Update data success');
