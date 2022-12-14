@@ -140,6 +140,9 @@ function App() {
         modepin2: checkPin2,
         modeauto: autoCheck,
         threshold: value,
+        temperature: temperature,
+        humidity: humidity,
+
       }).then(
           () => {
               console.log('Update data success');
@@ -157,6 +160,8 @@ function App() {
         modepin2: checkPin2,
         modeauto: autoCheck,
         threshold: value,
+        temperature: temperature,
+        humidity: humidity,
       }).then(
           () => {
               console.log('Update data success');
@@ -174,6 +179,8 @@ function App() {
         modepin2: mode,
         modeauto: autoCheck,
         threshold: value,
+        temperature: temperature,
+        humidity: humidity,
       }).then(
           () => {
               console.log('Update data success');
@@ -191,6 +198,8 @@ function App() {
         modepin2: checkPin2,
         modeauto: autoCheck,
         threshold: value,
+        temperature: temperature,
+        humidity: humidity,
       }).then(
           () => {
               console.log('Update data success');
