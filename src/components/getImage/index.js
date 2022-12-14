@@ -27,7 +27,7 @@ const GetImageA = () => {
 
   return (
     <>
-        <img style={{width:"300px", height:"300px"}} src={imageUrls} />
+        <img style={{width:"500px", height:"350px"}} src={imageUrls} />
     </>
   );
 }
