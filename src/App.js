@@ -37,11 +37,10 @@ function App() {
 
   const [humidity, setHumidity] = useState(0);
   const [temperature, setTemperature] = useState(0);
-  const [pause, setPause] = useState(0);
 
   const [inputValue, setInputValue] = useState(() => {
     const dbRef = ref(db);
-    get(child(dbRef,'threshold/value')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/threshold/')).then((snapshot) => {
       if(snapshot.exists()) {
         return snapshot.val().toString();
       }
@@ -53,51 +52,35 @@ function App() {
 
   const getData = () => {
     const dbRef = ref(db);
-    get(child(dbRef,'humidity')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/humidity')).then((snapshot) => {
       if(snapshot.exists()) {
         setHumidity(snapshot.val());
       }
     })
 
-    get(child(dbRef,'temperature')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/temperature')).then((snapshot) => {
       if(snapshot.exists()) {
         setTemperature(snapshot.val());
       }
     })
-    get(child(dbRef,'mode/fan/mode')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/modepin1')).then((snapshot) => {
       if(snapshot.exists()) {
-        if(snapshot.val() != checkFan.toString()) {
-          if(snapshot.val() == 'true') {
-            setSrcFan(FanOnIcon)
-            setCheckFan(true);
-          }
-          else {
-            setCheckFan(false);
-            setSrcFan(FanOffIcon)
-          }
-        }  
+        console.log(snapshot.val())
+        if(snapshot.val() == true) {
+          setSrcPin1(PinOnIcon)
+          setCheckPin1(true);
+        }
+        else {
+          
+          setSrcPin1(PinOffIcon);
+          setCheckPin1(false)
+        }
       }
     })
 
-    get(child(dbRef,'mode/pin1/mode')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/modepin2')).then((snapshot) => {
       if(snapshot.exists()) {
-        if(snapshot.val() != checkPin1.toString()) {
-          if(snapshot.val() == 'true') {
-            setSrcPin1(PinOnIcon)
-            setCheckPin1(true);
-          }
-          else {
-            setSrcPin1(PinOffIcon)
-            setCheckPin1(false);
-          }
-        }  
-      }
-    })
-
-    get(child(dbRef,'mode/pin2/mode')).then((snapshot) => {
-      if(snapshot.exists()) {
-        if(snapshot.val() != checkPin2.toString()) {
-          if(snapshot.val() == 'true') {
+          if(snapshot.val() == true) {
             setSrcPin2(PinOnIcon)
             setCheckPin2(true);
           }
@@ -105,22 +88,32 @@ function App() {
             setSrcPin2(PinOffIcon)
             setCheckPin2(false);
           }
-        }  
       }
     })
 
-    get(child(dbRef,'mode/mist/mode')).then((snapshot) => {
+    get(child(dbRef,'DAIOT/modefan')).then((snapshot) => {
       if(snapshot.exists()) {
-        if(snapshot.val() != checkMist.toString()) {
-          if(snapshot.val() == 'true') {
-            setSrcMist(MistOnIcon)
-            setCheckMist(true);
-          }
-          else {
-            setSrcMist(MistOffIcon)
-            setCheckMist(false);
-          }
-        }  
+        if(snapshot.val() == true) {
+          setSrcFan(FanOnIcon)
+          setCheckFan(true);
+        }
+        else {
+          setSrcFan(FanOffIcon)
+          setCheckFan(false);
+        }
+      }
+    })
+
+    get(child(dbRef,'DAIOT/modemist')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() == true) {
+          setSrcMist(MistOnIcon)
+          setCheckMist(true);
+        }
+        else {
+          setSrcMist(MistOffIcon)
+          setCheckMist(false);
+        }
       }
     })
 
@@ -136,50 +129,114 @@ function App() {
   
 
   const updateData = ({device, mode}) => {
-    set(ref(db,'mode/' + device),
-    {
-      mode: mode
-    }).then(
-        () => {
-            console.log('Update data success');
-        } 
-    )
-    .catch((error) => alert("Err: " + error));
+    console.log(mode, inputValue)
+    const value = inputValue ? inputValue : '25'
+    if(device == 'modefan') {
+      set(ref(db,'DAIOT/'),
+      {
+        modefan: mode,
+        modemist: checkMist,
+        modepin1: checkPin1,
+        modepin2: checkPin2,
+        modeauto: autoCheck,
+        threshold: value,
+      }).then(
+          () => {
+              console.log('Update data success');
+          } 
+      )
+      .catch((error) => alert("Err: " + error));
+    }
+
+    if(device == 'modepin1') {
+      set(ref(db,'DAIOT/'),
+      {
+        modefan: checkFan,
+        modemist: checkMist,
+        modepin1: mode,
+        modepin2: checkPin2,
+        modeauto: autoCheck,
+        threshold: value,
+      }).then(
+          () => {
+              console.log('Update data success');
+          } 
+      )
+      .catch((error) => alert("Err: " + error));
+    }
+
+    if(device == 'modepin2') {
+      set(ref(db,'DAIOT/'),
+      {
+        modefan: checkFan,
+        modemist: checkMist,
+        modepin1: checkPin1,
+        modepin2: mode,
+        modeauto: autoCheck,
+        threshold: value,
+      }).then(
+          () => {
+              console.log('Update data success');
+          } 
+      )
+      .catch((error) => alert("Err: " + error));
+    }
+
+    if(device == 'modemist') {
+      set(ref(db,'DAIOT/'),
+      {
+        modefan: checkFan,
+        modemist: mode,
+        modepin1: checkPin1,
+        modepin2: checkPin2,
+        modeauto: autoCheck,
+        threshold: value,
+      }).then(
+          () => {
+              console.log('Update data success');
+          } 
+      )
+      .catch((error) => alert("Err: " + error));
+    }
+    
+    
 }
 
   const onChangeFan = (e) => {
     console.log(e)
-    const device = 'fan';
+    const device = 'modefan';
     let mode;
     if(e) {
-      mode = 'true';
-      updateData({device, mode})
+      mode = true;
       setSrcFan(FanOnIcon)
       setCheckFan(true)
+      updateData({device, mode})
     }
     else {
-      mode = 'false';
-      updateData({device, mode})
+      mode = false;
       setSrcFan(FanOffIcon)
       setCheckFan(false)
+      updateData({device, mode})
     }
   }
 
   const onChangeMist = (e) => {
     console.log(e)
-    const device = 'mist';
+    const device = 'modemist';
     let mode;
     if(e) {
-      mode = 'true';
-      updateData({device, mode})
+      mode = true;
+      
       setSrcMist(MistOnIcon)
       setCheckMist(true)
+      updateData({device, mode})
+
     }
     else {
-      mode = 'false';
-      updateData({device, mode})
+      mode = false;
       setSrcMist(MistOffIcon);
       setCheckMist(false)
+      updateData({device, mode})
     }
   }
 
@@ -187,33 +244,35 @@ function App() {
   // Initialize Firebase
   const onChangePin1 = (e) => {
     console.log(e);
-    const device = 'pin1';
+    const device = 'modepin1';
     let mode;
     if(e) {
-      mode = 'true';
-      updateData({device, mode})
+      mode = true;
+      
       setSrcPin1(PinOnIcon);
       setCheckPin1(true);
+      updateData({device, mode})
     }
     else {
-      mode = 'false';
-      updateData({device, mode})
+      mode = false;
+      
       setSrcPin1(PinOffIcon);
       setCheckPin1(false);
+      updateData({device, mode})
     }    
   };
 
   const onChangePin2 = (e) => {
-    const device = 'pin2';
+    const device = 'modepin2';
     let mode;
     if(e) {
-      mode = 'true';
+      mode = true;
       updateData({device, mode})
       setSrcPin2(PinOnIcon)
       setCheckPin2(true);
     }
     else {
-      mode = 'false';
+      mode = false;
       updateData({device, mode})
       setSrcPin2(PinOffIcon);
       setCheckPin2(false);
@@ -233,9 +292,9 @@ function App() {
   const handleAutocheck = () => {
     setAutoCheck(!autoCheck);
     console.log(autoCheck)
-    set(ref(db,'auto/'),
+    set(ref(db,'DAIOT/'),
     {
-      mode: autoCheck
+      modeauto: autoCheck
     }).then(
       () => {
           console.log('Update data success');
@@ -245,10 +304,9 @@ function App() {
   }
 
   const ChangeInputVale = () => {
-    console.log("inputValue",inputValue)
-    set(ref(db,'threshold/'),
+    set(ref(db,'DAIOT/'),
     {
-      value: inputValue
+      threshold: inputValue
     }).then(
       () => {
           console.log('Update data success');

@@ -14,11 +14,9 @@ const GetImageA = () => {
 
   useEffect(() => {
     setInterval(() => {
-        console.log("abc")
         listAll(imagesListRef).then((response) => {
             response.items.forEach((item) => {
               getDownloadURL(item).then((url) => {
-                  console.log('url', url)
                 setImageUrls(url);
               });
             });
