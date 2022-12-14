@@ -9,8 +9,10 @@
     "antd": "^5.0.0",
     "firebase": "^9.15.0",
     "react": "^18.2.0",
+    "react-audio-waveform": "^0.0.5",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
+    "react-wavy-audio": "^1.0.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

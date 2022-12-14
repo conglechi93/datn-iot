@@ -17,6 +17,9 @@ import PinOffIcon from './image/pin_off.png';
 import { Crud } from './components/crud';
 import StartFirebase from './firebaseConfig';
 import GetImageA from './components/getImage';
+import WaveForm from './components/waveform';
+import Player from "react-wavy-audio";
+
 
 
 
@@ -63,10 +66,21 @@ function App() {
         setTemperature(snapshot.val());
       }
     })
+
+    get(child(dbRef,'DAIOT/modeauto')).then((snapshot) => {
+      if(snapshot.exists()) {
+        if(snapshot.val() == 'true') {
+          setAutoCheck(true)
+        }
+        else {
+          setAutoCheck(false)
+        }
+      }
+    })
+
     get(child(dbRef,'DAIOT/modepin1')).then((snapshot) => {
       if(snapshot.exists()) {
-        console.log(snapshot.val())
-        if(snapshot.val() == true) {
+        if(snapshot.val() == 'true') {
           setSrcPin1(PinOnIcon)
           setCheckPin1(true);
         }
@@ -80,7 +94,7 @@ function App() {
 
     get(child(dbRef,'DAIOT/modepin2')).then((snapshot) => {
       if(snapshot.exists()) {
-          if(snapshot.val() == true) {
+          if(snapshot.val() == 'true') {
             setSrcPin2(PinOnIcon)
             setCheckPin2(true);
           }
@@ -93,7 +107,7 @@ function App() {
 
     get(child(dbRef,'DAIOT/modefan')).then((snapshot) => {
       if(snapshot.exists()) {
-        if(snapshot.val() == true) {
+        if(snapshot.val() == 'true') {
           setSrcFan(FanOnIcon)
           setCheckFan(true);
         }
@@ -106,7 +120,7 @@ function App() {
 
     get(child(dbRef,'DAIOT/modemist')).then((snapshot) => {
       if(snapshot.exists()) {
-        if(snapshot.val() == true) {
+        if(snapshot.val() == 'true') {
           setSrcMist(MistOnIcon)
           setCheckMist(true);
         }
@@ -134,15 +148,7 @@ function App() {
     if(device == 'modefan') {
       update(ref(db,'DAIOT/'),
       {
-        modefan: mode,
-        modemist: checkMist,
-        modepin1: checkPin1,
-        modepin2: checkPin2,
-        modeauto: autoCheck,
-        threshold: value,
-        temperature: temperature,
-        humidity: humidity,
-
+        modefan: mode.toString(),
       }).then(
           () => {
               console.log('Update data success');
@@ -154,14 +160,7 @@ function App() {
     if(device == 'modepin1') {
       update(ref(db,'DAIOT/'),
       {
-        modefan: checkFan,
-        modemist: checkMist,
-        modepin1: mode,
-        modepin2: checkPin2,
-        modeauto: autoCheck,
-        threshold: value,
-        temperature: temperature,
-        humidity: humidity,
+        modepin1: mode.toString(),
       }).then(
           () => {
               console.log('Update data success');
@@ -173,14 +172,7 @@ function App() {
     if(device == 'modepin2') {
       update(ref(db,'DAIOT/'),
       {
-        modefan: checkFan,
-        modemist: checkMist,
-        modepin1: checkPin1,
-        modepin2: mode,
-        modeauto: autoCheck,
-        threshold: value,
-        temperature: temperature,
-        humidity: humidity,
+        modepin2: mode.toString(),
       }).then(
           () => {
               console.log('Update data success');
@@ -192,14 +184,7 @@ function App() {
     if(device == 'modemist') {
       update(ref(db,'DAIOT/'),
       {
-        modefan: checkFan,
-        modemist: mode,
-        modepin1: checkPin1,
-        modepin2: checkPin2,
-        modeauto: autoCheck,
-        threshold: value,
-        temperature: temperature,
-        humidity: humidity,
+        modemist: mode.toString(),
       }).then(
           () => {
               console.log('Update data success');
@@ -302,7 +287,7 @@ function App() {
     setAutoCheck(!autoCheck);
     update(ref(db,'DAIOT/'),
     {
-      modeauto: !autoCheck
+      modeauto: (!autoCheck).toString()
     }).then(
       () => {
           console.log('Update data success');
@@ -314,7 +299,7 @@ function App() {
   const ChangeInputVale = () => {
     update(ref(db,'DAIOT/'),
     {
-      threshold: inputValue
+      threshold: inputValue.toString()
     }).then(
       () => {
           console.log('Update data success');
@@ -322,6 +307,29 @@ function App() {
     )
     .catch((error) => alert("Err: " + error));
   }
+
+  const [wave,setWave] = useState()
+
+  const ChangeWave = () => {
+    //setWave(<WaveForm></WaveForm>)
+    setWave(<Player
+      imageUrl="https://pbs.twimg.com/media/A-lU5FnCcAA1Edi.jpg"
+      audioUrl="https://www.mfiles.co.uk/mp3-downloads/gs-cd-track2.mp3"
+      waveStyles={{
+        cursorWidth: 1,
+        progressColor: "#ee3ec9",
+        responsive: true,
+        waveColor: "#121640",
+        cursorColor: "transparent",
+        barWidth: 0
+      }}
+      zoom={10}
+      hideImage="true"
+      //hideWave="true"
+      //containerStyle={}
+    />)
+  }
+
 
 
   return (
@@ -380,14 +388,15 @@ function App() {
           </div>
         </div>
 
-
+        <div className='form-tilte'>
         <div style={{textAlign:"center"}}>
           <div style={{textAlign:"center"}}>SOUND WAVE</div>
-          <img src={SoundWaveImg}></img>
+              {wave}
           <div>
-          <button>Chọn file</button>
+            <button onClick={ChangeWave}>Hiển thị âm thanh</button>
           </div>
           
+        </div>
         </div>
 
 
@@ -420,8 +429,6 @@ function App() {
             <GetImageA></GetImageA>
           </div>
         </div>
-
-      
       </header>
     </div>
   );
